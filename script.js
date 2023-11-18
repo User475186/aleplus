@@ -1,3 +1,18 @@
+// ==UserScript==
+// @name         ALE+
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Improves level editor
+// @author       You
+// @match        https://www.plazmaburst2.com/level_editor/map_edit.php*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=plazmaburst2.com
+// @grant        none
+// ==/UserScript==
+
+let script = document.createElement("script");
+
+script.src = "data:text," + escape(`
+
 // Style
 
 let saveMap = document.getElementsByClassName("field_btn")[0];
@@ -31,25 +46,25 @@ function updateStyle() {
 	let mapRights = document.getElementById("maprights");
 	let parambox = document.getElementById("parambox");
 	let versionText = versionRights.childNodes[0];
-	
+
 	let buttonElements = document.getElementsByClassName("tool_btn tool_wid");
-	
+
 	for (let i = 0; i < buttonElements.length; i++) {
 		if (buttonElements[i].style.width == "100%") {
 			editAsText = buttonElements[i];
 		}
 	}
-	
+
 	document.querySelectorAll("a").forEach(elem => {
 		if (elem.onmousedown == "function onmousedown(event) {\\nGridSnappingSet(50);\\n}") {
 			snapping5 = elem;
 		}
-		
+
 		if (elem.onmousedown == "function onmousedown(event) {\\nGridSnappingSet(100);\\n}") {
 			snapping10 = elem;
 		}
 	});
-	
+
 	topPanel.style.backgroundColor = "rgb(8, 8, 8)";
 	leftPanel.style.backgroundColor = "rgb(8, 8, 8)";
 	rightPanel.style.backgroundColor = "rgb(8, 8, 8)";
@@ -70,13 +85,13 @@ function updateStyle() {
 	versionText.style.fontWeight = "bold";
 	versionText.style.color = "#00FF00";
 	versionText.innerHTML = "ALE+ by gCP5o";
-	
+
 	if (innerWidth >= 1400) {
 		versionRights.style.display = "block";
 	} else {
 		versionRights.style.display = "none";
 	}
-	
+
 	if (innerWidth >= 1250) {
 		rights.style.display = "inline-block";
 		mapRights.style.display = "inline-block";
@@ -86,26 +101,26 @@ function updateStyle() {
 	}
 
 	topPanel.style.height = "48px";
-	
+
 	leftPanel.style.top = "48px";
 	rightPanel.style.top = "48px";
-	
+
 	if (snapping5) {
 		snapping5.onmousedown = function() {
 			GridSnappingSet(40);
 		}
-		
+
 		snapping5.innerHTML = "4";
 	}
-	
+
 	if (snapping10) {
 		snapping10.onmousedown = function() {
 			GridSnappingSet(50);
 		}
-		
+
 		snapping10.innerHTML = "5";
 	}
-	
+
 	document.querySelectorAll("*").forEach(elem => {
 		if (elem.className != "notediv" && elem != versionText && elem != p) {
 			if (elem.parentElement) {
@@ -121,15 +136,15 @@ function updateStyle() {
 					}
 				}
 			}
-			
+
 			if (elem.style.marginTop == "-100px") {
 				elem.style.marginTop = "";
 			}
-			
+
 			if (elem.getBoundingClientRect().y == 48 && elem.className == "field_btn") {
 				elem.style.marginTop = "-100px";
 			}
-			
+
 			if (elem.title) {
 				elem.dataset.title = elem.title;
 				elem.title = "";
@@ -140,16 +155,16 @@ function updateStyle() {
 
 function downloadXML() {
 	let newstr = "";
-	
+
 	for (let i = 0; i < es.length; i++) {
 		if (es[i].exists) {
 			newstr += compi_obj(i);
 		}
 	}
-	
+
 	download.href = "data:text," + escape(newstr);
 	download.download = mapid_field.value + ".xml";
-	
+
 	download.click();
 	download.href = "";
 }
@@ -159,15 +174,15 @@ document.querySelectorAll("input").forEach(elem => {
 		elem.onclick = function() {
 			window.open("https://eaglepb2.gitbook.io/pb2-editor-manual/");
 		}
-		
+
 		elem.dataset.title = "Editor Manual by EaglePB2";
 	}
-	
+
 	if (elem.onclick == "function onclick(event) {\\nTestMap()\\n}") {
 		elem.onclick = function() {
 			downloadXML();
 		}
-		
+
 		elem.value = "Download XML";
 	}
 });
@@ -194,7 +209,7 @@ document.addEventListener("mousemove", e => {
 		p.style.left = e.clientX + 20 + "px";
 		p.style.top = e.clientY + "px";
 		p.innerHTML = e.target.dataset.title;
-		
+
 		if (p.getBoundingClientRect().height != 31) {
 			p.style.left = "0px";
 			p.style.left = e.clientX - 20 - p.getBoundingClientRect().width + "px";
@@ -204,7 +219,7 @@ document.addEventListener("mousemove", e => {
 			p.style.left = e.clientX + 20 + "px";
 			p.style.top = e.clientY + "px";
 			p.innerHTML = e.target.parentElement.dataset.title;
-			
+
 			if (p.getBoundingClientRect().height != 31) {
 				p.style.left = "0px";
 				p.style.left = e.clientX - 20 - p.getBoundingClientRect().width + "px";
@@ -231,10 +246,10 @@ document.body.onload = function() {
 
 function findObjects(name) {
 	let notFound = 1;
-	
+
 	for (let i = 0; i < es.length; i++) {
 		es[i].selected = 0;
-		
+
 		if (es[i].pm.uid) {
 			if (es[i].pm.uid.includes(name) && MatchLayer(es[i])) {
 				es[i].selected = 1;
@@ -242,14 +257,14 @@ function findObjects(name) {
 			}
 		}
 	}
-	
+
 	need_GUIParams_update = 1;
 	need_redraw = 1;
-	
+
 	setTimeout(function() {
 		updateStyle();
 	}, 100);
-	
+
 	return notFound;
 }
 
@@ -258,27 +273,27 @@ document.addEventListener("keydown", e => {
 		e.preventDefault();
 		saveMap.click();
 	}
-	
+
 	if (e.ctrlKey && e.code == "KeyF") {
 		e.preventDefault();
-		
+
 		let name = prompt("Find objects:", "");
-		
+
 		if (name !== null && name !== "") {
 			let notFound = findObjects(name);
-			
+
 			if (notFound) {
 				alert("Nothing found.");
 			}
 		}
 	}
-	
+
 	if (e.ctrlKey && e.code == "KeyZ") {
 		setTimeout(function() {
 			updateStyle();
 		}, 100);
 	}
-	
+
 	if (e.ctrlKey && e.code == "KeyY") {
 		setTimeout(function() {
 			updateStyle();
@@ -456,14 +471,14 @@ function stopedit(e) {
 	if (e) {
 		if (e.keyCode == 13 && e.type == "keydown") {
 			let chvalue = ff.value;
-			
+
 			if (!isNaN(Number(chvalue))) {
 				UpdatePhysicalParam((lettarget.id.replace(lIcDIOOIl, llcDlCl)), Number(chvalue));
-				
+
 				lettarget.innerHTML = chvalue;
-				
+
 				need_GUIParams_update = 1;
-				
+
 				setTimeout(function() {
 					updateStyle();
 				}, 100);
@@ -471,13 +486,13 @@ function stopedit(e) {
 				chvalue = chvalue.replaceAll("<", "&lt;");
 				chvalue = chvalue.replaceAll(">", "&gt;");
 				chvalue = chvalue.replaceAll('"', "&quot;");
-				
+
 				UpdatePhysicalParam((lettarget.id.replace(lIcDIOOIl, llcDlCl)), chvalue);
-				
+
 				lettarget.innerHTML = chvalue;
-				
+
 				need_GUIParams_update = 1;
-				
+
 				setTimeout(function() {
 					updateStyle();
 				}, 100);
@@ -499,7 +514,7 @@ function UpdatePhysicalParam(paramname, chvalue) {
                         if (typeof (chvalue) == lICDIODIl || chvalue == 0) {
                             lnd(llCGIcGIl + elems + llCDlODll + lup + licDICOIl + es[elems].pm[paramname] + liODlcGIl);
                             ldn(llCGIcGIl + elems + llCDlODll + lup + licDICOIl + chvalue + liODlcGIl);
-                            
+
 							if (chvalue !== "") {
 								es[elems].pm[paramname] = Number(chvalue);
 							} else {
@@ -527,24 +542,24 @@ function UpdatePhysicalParam(paramname, chvalue) {
 document.addEventListener("keydown", e => {
 	if (e.code == "AltLeft" && letediting) {
 		let value = prompt("Enter string-value:", "");
-		
+
 		if (value !== null) {
 			setletedit(value, "Custom Value", "");
-			
+
 			need_GUIParams_update = 1;
-			
+
 			setTimeout(function() {
 				updateStyle();
 			}, 100);
 		}
 	}
-	
+
 	if (e.code == "AltRight") {
 		let value = prompt("Enter snapping:", "");
-		
+
 		if (value !== null) {
 			GridSnappingSet(Math.round(value * 10));
-			
+
 			setTimeout(function() {
 				updateStyle();
 			}, 10);
@@ -626,10 +641,14 @@ function DeleteSelection() {
     lfz(true);
     need_GUIParams_update = true;
     need_redraw = true;
-	
+
 	setTimeout(function() {
 		updateStyle();
 	}, 100);
 }
 
 console.clear();
+
+`);
+
+document.body.append(script);
